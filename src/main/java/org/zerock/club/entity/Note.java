@@ -25,7 +25,7 @@ public class Note extends BaseEntity{
         this.title = title;
     }
 
-    public void changeContent(String Content) {
+    public void changeContent(String content) {
         this.content = content;
     }
 }

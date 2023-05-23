@@ -5,10 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,9 +27,6 @@ public class SecurityConfig {
     @Autowired
     private ClubUserDetailsService userDetailsService;
 
-    @Autowired
-    private AuthenticationConfiguration authenticationConfiguration;
-
     @Bean
     PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
@@ -42,6 +37,13 @@ public class SecurityConfig {
 //                .requestMatchers("/sample/all").permitAll()
 //                .anyRequest().authenticated();
 
+        AuthenticationManagerBuilder authenticationManagerBuilder
+                = http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+
+        AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
+        http.authenticationManager(authenticationManager);
+
         http.formLogin().successHandler(handler());
         http.csrf().disable();
         http.logout();
@@ -49,7 +51,7 @@ public class SecurityConfig {
         http.rememberMe().tokenValiditySeconds(60*60*24*7).userDetailsService(userDetailsService);
 
         http.addFilterBefore(apiCheckFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(apiLoginFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(apiLoginFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -65,10 +67,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public ApiLoginFilter apiLoginFilter() throws  Exception {
+    public ApiLoginFilter apiLoginFilter(AuthenticationManager authenticationManager) throws  Exception {
         ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login");
-
-        apiLoginFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
+        apiLoginFilter.setAuthenticationManager(authenticationManager);
 
         return apiLoginFilter;
     }

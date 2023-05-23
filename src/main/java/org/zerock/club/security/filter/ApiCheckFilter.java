@@ -38,7 +38,6 @@ public class ApiCheckFilter extends OncePerRequestFilter {
 
             if(checkHeader) {
                 filterChain.doFilter(request, response);
-                return;
             }
             else {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -51,8 +50,8 @@ public class ApiCheckFilter extends OncePerRequestFilter {
                 PrintWriter out = response.getWriter();
                 out.print(json);
 
-                return;
             }
+            return;
         }
 
         filterChain.doFilter(request, response);

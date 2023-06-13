@@ -13,7 +13,7 @@ import java.util.Date;
 public class JWTUtil {
     private String secretKey = "zerock12345678";
 
-    private long expire = 60 * 24 * 30;
+    private long expire = 60 * 24 * 300;
 
     public String generateToken(String content) throws Exception {
         return Jwts.builder()

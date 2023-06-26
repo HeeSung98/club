@@ -20,6 +20,8 @@ public class JWTUtil {
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(ZonedDateTime.now()
                         .plusMinutes(expire).toInstant()))
+//                .setExpiration(Date.from(ZonedDateTime.now()
+//                        .plusSeconds(1).toInstant()))
                 .claim("sub", content)
                 .signWith(SignatureAlgorithm.HS256,
                         secretKey.getBytes("UTF-8"))

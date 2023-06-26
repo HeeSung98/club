@@ -10,13 +10,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.zerock.club.security.dto.ClubAuthMemberDTO;
+import org.zerock.club.util.JWTUtil;
 
 import java.io.IOException;
 
 @Log4j2
 public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
-    public ApiLoginFilter(String defaultFilterProcessUrl) {
+    private JWTUtil jwtUtil;
+    public ApiLoginFilter(String defaultFilterProcessUrl, JWTUtil jwtUtil) {
         super(defaultFilterProcessUrl);
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -42,5 +45,20 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         log.info("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡApiLoginFilterㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
         log.info("successfulAuthentication: " + authentication);
         log.info(authentication.getPrincipal());
+
+        //email
+        String email = ((ClubAuthMemberDTO)authentication.getPrincipal()).getUsername();
+
+        String token = null;
+        try {
+            token = jwtUtil.generateToken(email);
+
+            response.setContentType("text/plain");
+            response.getOutputStream().write(token.getBytes());
+
+            log.info("token: " + token);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

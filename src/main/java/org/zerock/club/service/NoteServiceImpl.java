@@ -25,6 +25,7 @@ public class NoteServiceImpl implements NoteService{
         log.info(note);
 
         noteRepository.save(note);
+        String[] temp = {};
 
         return note.getNum();
     }
@@ -36,7 +37,6 @@ public class NoteServiceImpl implements NoteService{
         if(result.isPresent()) {
             return entityToDTO(result.get());
         }
-
         NoteDTO noteDTO = entityToDTO(result.get());
 
         return noteDTO;

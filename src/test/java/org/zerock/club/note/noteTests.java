@@ -8,6 +8,8 @@ import org.zerock.club.entity.Note;
 import org.zerock.club.repository.NoteRepository;
 import org.zerock.club.service.NoteService;
 
+import java.util.HashMap;
+
 @SpringBootTest
 public class noteTests {
     @Autowired
